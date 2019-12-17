@@ -20,8 +20,7 @@ ci_build() {
         echo "LDFLAGS += -Wl,-z,relro -Wl,-z,now"
     } > config.mak
 
-    # FIXME: grep.c is not buildable with pedantic if libpcre is enabled.
-    ./configure --prefix="$BUILD" --without-libpcre
+    ./configure --prefix="$BUILD"
     make -j"$(nproc)"
     make install
     make install-html
