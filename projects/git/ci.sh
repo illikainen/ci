@@ -35,7 +35,7 @@ ci_test() {
         exit 1
     fi
 
-    if git diff HEAD^ HEAD |grep -P '^\+ '; then
+    if git diff HEAD^ HEAD |grep -P '^\+ [^*]'; then
         echo "indent with tabs" >&2
         exit 1
     fi
