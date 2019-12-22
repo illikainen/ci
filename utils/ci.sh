@@ -4,6 +4,19 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+RED="\\033[31m"
+GREEN="\\033[32m"
+RESET="\\033[0m"
+
+ci_info() {
+    echo -e "${GREEN}$*${RESET}"
+}
+
+ci_error() {
+    echo -e "${RED}ERROR${RESET}: $*" >&2
+    exit 1
+}
+
 ci_on_start() {
     if test -f /etc/debian_version; then
         sudo apt-get update
@@ -29,8 +42,7 @@ main() {
     local project="${CI}/projects/${APPVEYOR_PROJECT_NAME:-missing}/ci.sh"
 
     if ! test -f "$project"; then
-        echo "ERROR: invalid project: $project" >&2
-        exit 1
+        ci_error "invalid project: $project"
     fi
 
     # shellcheck disable=SC1090
@@ -39,9 +51,9 @@ main() {
     local cmd
     for cmd in "$@"; do
         if ! command -v "ci_${cmd}"; then
-            echo "ERROR: invalid command: $cmd" >&2
-            exit 1
+            ci_error "invalid command: $cmd"
         fi
+        ci_info "running $cmd"
         "ci_${cmd}"
     done
 }
