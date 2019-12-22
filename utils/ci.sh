@@ -3,7 +3,6 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
 
 ci_on_start() {
     if test -f /etc/debian_version; then
