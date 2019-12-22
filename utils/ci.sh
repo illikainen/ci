@@ -46,4 +46,6 @@ main() {
     done
 }
 
-main "$@"
+if [[ "$(basename "$0")" == "ci.sh" ]]; then
+    main "$@"
+fi
