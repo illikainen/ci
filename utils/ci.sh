@@ -27,7 +27,6 @@ ci_on_finish() {
 }
 
 main() {
-    local cmd="ci_${1:-missing}"
     local project="${CI}/projects/${APPVEYOR_PROJECT_NAME:-missing}/ci.sh"
 
     if ! test -f "$project"; then
@@ -38,13 +37,14 @@ main() {
     # shellcheck disable=SC1090
     source "$project"
 
-    if ! command -v "$cmd"; then
-        echo "ERROR: invalid command: $cmd" >&2
-        exit 1
-    fi
-
-    shift
-    "$cmd" "$@"
+    local cmd
+    for cmd in "$@"; do
+        if ! command -v "ci_${cmd}"; then
+            echo "ERROR: invalid command: $cmd" >&2
+            exit 1
+        fi
+        "ci_${cmd}"
+    done
 }
 
 main "$@"
