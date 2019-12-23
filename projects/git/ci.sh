@@ -2,14 +2,14 @@
 
 ci_install() {
     if ci_is_debian || ci_is_ubuntu; then
-        sudo apt-get --yes install \
-             asciidoc \
-             autoconf \
-             automake \
-             build-essential \
-             libcurl4-gnutls-dev \
-             libpcre2-dev \
-             zlib1g-dev
+        ci_sudo apt-get --yes install \
+                asciidoc \
+                autoconf \
+                automake \
+                build-essential \
+                libcurl4-gnutls-dev \
+                libpcre2-dev \
+                zlib1g-dev
     fi
 }
 

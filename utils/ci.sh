@@ -17,6 +17,17 @@ ci_error() {
     exit 1
 }
 
+ci_sudo () {
+    if [[ "$(id -u)" -ne 0 ]]; then
+        if ! command -v sudo >/dev/null; then
+            ci_error "need sudo"
+        fi
+        sudo "$@"
+    else
+        "$@"
+    fi
+}
+
 ci_is_debian() {
     command -v lsb_release >/dev/null &&
         [[ "$(lsb_release --id --short)" == "Debian" ]]
@@ -37,8 +48,8 @@ ci_is_fedora() {
 
 ci_on_start() {
     if ci_is_debian || ci_is_ubuntu; then
-        sudo apt-get update
-        sudo apt-get --yes install python3-irc
+        ci_sudo apt-get update
+        ci_sudo apt-get --yes install python3-irc
     fi
 
     "${CI}/utils/report-irc.py" --stage start
