@@ -2,14 +2,12 @@
 
 ci_install() {
     if ci_is_debian || ci_is_ubuntu; then
-        ci_sudo apt-get --yes install \
-                asciidoc \
-                autoconf \
-                automake \
-                build-essential \
-                libcurl4-gnutls-dev \
-                libpcre2-dev \
-                zlib1g-dev
+        ci_sudo cp /etc/apt/sources.list /etc/apt/sources.list.d/src.list
+        ci_sudo sed -i 's/^deb[ \s]/deb-src /' /etc/apt/sources.list.d/src.list
+
+        ci_sudo apt-get update
+        ci_sudo apt-get --assume-yes build-dep git
+        ci_sudo apt-get --assume-yes install autoconf automake gnupg gpgsm
     fi
 }
 
