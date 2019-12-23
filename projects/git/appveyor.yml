@@ -16,6 +16,7 @@ environment:
   IRC_CHANNELS:
     secure: k8v55p1PTJetGc+zIaNMFQ==
   CI: /tmp/ci
+  CI_PROJECT: $APPVEYOR_PROJECT_NAME
   BUILD: /tmp/build
   ARTIFACTS: artifacts
 

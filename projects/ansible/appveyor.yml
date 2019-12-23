@@ -21,6 +21,7 @@ environment:
   IRC_CHANNELS:
     secure: k8v55p1PTJetGc+zIaNMFQ==
   CI: /tmp/ci
+  CI_PROJECT: $APPVEYOR_PROJECT_NAME
   ARTIFACTS: docs/docsite/_build
 
 clone_depth: 50

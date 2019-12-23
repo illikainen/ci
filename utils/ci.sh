@@ -39,7 +39,7 @@ ci_on_finish() {
 }
 
 main() {
-    local project="${CI}/projects/${APPVEYOR_PROJECT_NAME:-missing}/ci.sh"
+    local project="${CI}/projects/${CI_PROJECT:-missing}/ci.sh"
 
     if ! test -f "$project"; then
         ci_error "invalid project: $project"
