@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 
 ci_install() {
-    sudo apt-get --yes install \
-         asciidoc \
-         autoconf \
-         automake \
-         build-essential \
-         libcurl4-gnutls-dev \
-         libpcre2-dev \
-         zlib1g-dev
+    if ci_is_debian || ci_is_ubuntu; then
+        sudo apt-get --yes install \
+             asciidoc \
+             autoconf \
+             automake \
+             build-essential \
+             libcurl4-gnutls-dev \
+             libpcre2-dev \
+             zlib1g-dev
+    fi
 }
 
 ci_build() {

@@ -2,10 +2,14 @@
 
 ci_install() {
     if [[ "$PYTHON" == "2.7" ]]; then
-        sudo apt-get install --yes python-apt
+        if ci_is_debian || ci_is_ubuntu; then
+            sudo apt-get install --yes python-apt
+        fi
         virtualenv -p "python$PYTHON" --system-site-packages venv
     else
-        sudo apt-get install --yes python3-apt python3-venv python3-dev
+        if ci_is_debian || ci_is_ubuntu; then
+            sudo apt-get install --yes python3-apt python3-venv python3-dev
+        fi
         "python$PYTHON" -m venv --system-site-packages venv
     fi
 

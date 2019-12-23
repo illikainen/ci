@@ -17,8 +17,26 @@ ci_error() {
     exit 1
 }
 
+ci_is_debian() {
+    command -v lsb_release >/dev/null &&
+        [[ "$(lsb_release --id --short)" == "Debian" ]]
+}
+
+ci_is_ubuntu() {
+    command -v lsb_release >/dev/null &&
+        [[ "$(lsb_release --id --short)" == "Ubuntu" ]]
+}
+
+ci_is_centos() {
+    test -f /etc/centos-release
+}
+
+ci_is_fedora() {
+    test -f /etc/fedora-release
+}
+
 ci_on_start() {
-    if test -f /etc/debian_version; then
+    if ci_is_debian || ci_is_ubuntu; then
         sudo apt-get update
         sudo apt-get --yes install python3-irc
     fi
