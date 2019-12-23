@@ -23,9 +23,6 @@ ci_build() {
     ./configure --prefix="$BUILD"
     make -j"$(nproc)"
     make install
-    make install-html
-
-    cp -a "$BUILD/share/doc/git" "$ARTIFACTS"
 }
 
 ci_test() {
