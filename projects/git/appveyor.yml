@@ -17,7 +17,7 @@ environment:
     secure: k8v55p1PTJetGc+zIaNMFQ==
   CI: /tmp/ci
   CI_PROJECT: $APPVEYOR_PROJECT_NAME
-  BUILD: /tmp/build
+  CI_DESTDIR: /tmp/build
 
 clone_depth: 50
 

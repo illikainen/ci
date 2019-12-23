@@ -20,7 +20,7 @@ ci_build() {
         echo "LDFLAGS += -Wl,-z,relro -Wl,-z,now"
     } > config.mak
 
-    ./configure --prefix="$BUILD"
+    ./configure --prefix="$CI_DESTDIR"
     make -j"$(nproc)"
     make install
 }
@@ -37,5 +37,5 @@ ci_test() {
         exit 1
     fi
 
-    PATH="${BUILD}/bin:${PATH}" make test
+    PATH="${CI_DESTDIR}/bin:${PATH}" make test
 }
