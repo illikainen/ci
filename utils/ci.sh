@@ -49,9 +49,11 @@ ci_is_fedora() {
 ci_on_start() {
     if ci_is_debian || ci_is_ubuntu; then
         ci_sudo apt-get update
-        ci_sudo apt-get --yes install python3-irc
+        ci_sudo apt-get --yes install python3-pip
     fi
 
+    # Not available in the Ubuntu 16.04 repos.
+    pip3 install irc==8.5.3
     "${CI}/utils/report-irc.py" --stage start
 }
 
