@@ -49,6 +49,10 @@ class AppVeyor:
     def irc_targets(self):
         return getenv("IRC_TARGETS")
 
+    @property
+    def irc_extra(self):
+        return ""
+
 
 class GitLab:
     @property
@@ -82,6 +86,10 @@ class GitLab:
     @property
     def irc_targets(self):
         return b64decode(getenv("IRC_TARGETS")).decode()
+
+    @property
+    def irc_extra(self):
+        return getenv("IRC_EXTRA")
 
 
 def get_host():
@@ -148,7 +156,7 @@ def format_message(host, stage):
     else:
         s = red("failure")
     return (
-        f"{s}: {host.project} at {purple(host.commit)} "
+        f"{host.irc_extra}{s}: {host.project} at {purple(host.commit)} "
         f"on {host.branch} - {host.url}"
     )
 

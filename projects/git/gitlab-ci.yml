@@ -22,8 +22,12 @@ variables:
 
 test:ubuntu-16.04:
   image: ubuntu:16.04
+  variables:
+    IRC_EXTRA: ubuntu-16.04
   <<: *apt
 
 test:ubuntu-latest:
   image: ubuntu:latest
+  variables:
+    IRC_EXTRA: ubuntu-latest
   <<: *apt
