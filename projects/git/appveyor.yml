@@ -19,6 +19,7 @@ environment:
   CI: /tmp/ci
   CI_PROJECT: $APPVEYOR_PROJECT_NAME
   CI_DESTDIR: /tmp/build
+  CI_CAN_START_BUILD: 1
 
 clone_depth: 50
 

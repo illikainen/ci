@@ -25,6 +25,7 @@ test:ubuntu-16.04:
   image: ubuntu:16.04
   variables:
     IRC_EXTRA: ubuntu-16.04
+    CI_CAN_START_BUILD: 1
   <<: *apt
 
 test:ubuntu-latest:

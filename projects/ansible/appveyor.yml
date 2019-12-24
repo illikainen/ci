@@ -23,6 +23,7 @@ environment:
   DEBIAN_FRONTEND: noninteractive
   CI: /tmp/ci
   CI_PROJECT: $APPVEYOR_PROJECT_NAME
+  CI_CAN_START_BUILD: 1
   ARTIFACTS: docs/docsite/_build
 
 clone_depth: 50

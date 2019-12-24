@@ -9,7 +9,6 @@ import json
 import sys
 from os import getenv
 from subprocess import PIPE, run
-from time import sleep
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -124,6 +123,9 @@ def get_commits(author, history):
 
 
 def main():
+    if not getenv("CI_CAN_START_BUILD"):
+        return
+
     host = get_host()
     author = get_author()
     history = host.get_history()
@@ -132,7 +134,6 @@ def main():
     for commit in commits:
         print("starting build for {}".format(commit))
         host.start_build(commit)
-        sleep(30)
 
 
 if __name__ == "__main__":
