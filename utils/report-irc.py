@@ -4,10 +4,30 @@ import ssl
 import sys
 from argparse import ArgumentParser
 from logging import DEBUG, basicConfig
-from os import getenv
+from os import getenv, environ
 
 from irc.client import IRC
 from irc.connection import Factory
+
+
+variables = {
+    "appveyor": {
+        "branch": "{APPVEYOR_REPO_BRANCH}",
+        "commit": "{APPVEYOR_REPO_COMMIT}",
+        "project": "{APPVEYOR_PROJECT_NAME}",
+        "url": (
+            "{APPVEYOR_URL}/project/{APPVEYOR_ACCOUNT_NAME}/"
+            "{APPVEYOR_PROJECT_NAME}/builds/{APPVEYOR_BUILD_ID}"
+        ),
+    }
+}
+
+
+def getvar(name):
+    for key, value in variables.items():
+        if getenv(key.upper()):
+            return value[name].format(**environ)
+    return getenv(name)
 
 
 def green(msg):
@@ -62,31 +82,6 @@ def parse_args():
         help="Disable SSL connections.",
     )
     ap.add_argument(
-        "--account",
-        default=getenv("APPVEYOR_ACCOUNT_NAME"),
-        help="AppVeyor account name.",
-    )
-    ap.add_argument(
-        "--project",
-        default=getenv("APPVEYOR_PROJECT_NAME"),
-        help="AppVeyor project name.",
-    )
-    ap.add_argument(
-        "--build-id",
-        default=getenv("APPVEYOR_BUILD_ID"),
-        help="AppVeyor build ID.",
-    )
-    ap.add_argument(
-        "--commit",
-        default=getenv("APPVEYOR_REPO_COMMIT"),
-        help="Commit ID for the build.",
-    )
-    ap.add_argument(
-        "--branch",
-        default=getenv("APPVEYOR_REPO_BRANCH"),
-        help="Branch being built.",
-    )
-    ap.add_argument(
         "--stage",
         choices=["start", "success", "failure"],
         required=True,
@@ -109,13 +104,12 @@ def format_message(args):
     else:
         stage = red("failure")
 
-    commit = purple(args.commit)
+    url = getvar("url")
+    project = getvar("project")
+    branch = getvar("branch")
+    commit = purple(getvar("commit"))
 
-    url = (
-        f"https://ci.appveyor.com/project/{args.account}/"
-        f"{args.project}/builds/{args.build_id}"
-    )
-    return f"{stage}: {args.project} at {commit} on {args.branch} - {url}"
+    return f"{stage}: {project} at {commit} on {branch} - {url}"
 
 
 def on_welcome(connection, _event):
