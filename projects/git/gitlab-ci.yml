@@ -1,5 +1,6 @@
 ---
 variables:
+  DEBIAN_FRONTEND: noninteractive
   CI: /tmp/ci
   CI_PROJECT: $CI_PROJECT_NAME
   CI_DESTDIR: /tmp/build

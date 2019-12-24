@@ -15,6 +15,7 @@ environment:
     secure: OVO9f8TnD9Jm8w1g4WaABg==
   IRC_TARGETS:
     secure: k8v55p1PTJetGc+zIaNMFQ==
+  DEBIAN_FRONTEND: noninteractive
   CI: /tmp/ci
   CI_PROJECT: $APPVEYOR_PROJECT_NAME
   CI_DESTDIR: /tmp/build
