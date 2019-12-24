@@ -26,6 +26,8 @@ ci_build() {
 }
 
 ci_test() {
+    export PATH="${CI_DESTDIR}/bin:${PATH}"
+
     key="Signed-off-by"
     if ! git log -1 --format="%(trailers:key=$key)" |grep -q "^$key"; then
         echo "missing trailer $key" >&2
@@ -37,5 +39,5 @@ ci_test() {
         exit 1
     fi
 
-    PATH="${CI_DESTDIR}/bin:${PATH}" make test
+    make test
 }
