@@ -26,11 +26,11 @@ class AppVeyor:
 
     @property
     def url(self):
-        return (
-            f"{getenv('APPVEYOR_URL')}/project/"
-            f"{getenv('APPVEYOR_ACCOUNT_NAME')}/"
-            f"{getenv('APPVEYOR_PROJECT_NAME')}/builds/"
-            f"{getenv('APPVEYOR_BUILD_ID')}"
+        return "{url}/project/{account}/{project}/builds/{build}".format(
+            url=getenv("APPVEYOR_URL"),
+            account=getenv("APPVEYOR_ACCOUNT_NAME"),
+            project=getenv("APPVEYOR_PROJECT_NAME"),
+            build=getenv("APPVEYOR_BUILD_ID"),
         )
 
     @property
@@ -89,7 +89,7 @@ class GitLab:
 
     @property
     def irc_extra(self):
-        return getenv("IRC_EXTRA")
+        return "{}: ".format(getenv("IRC_EXTRA"))
 
 
 def get_host():
@@ -99,24 +99,24 @@ def get_host():
     if getenv("GITLAB_CI"):
         return GitLab()
 
-    sys.stderr.write(f"invalid host")
+    sys.stderr.write("invalid host")
     sys.exit(1)
 
 
 def green(msg):
-    return f"\x0303{msg}\x0f"
+    return "\x0303{}\x0f".format(msg)
 
 
 def red(msg):
-    return f"\x0304{msg}\x0f"
+    return "\x0304{}\x0f".format(msg)
 
 
 def purple(msg):
-    return f"\x0306{msg}\x0f"
+    return "\x0306{}\x0f".format(msg)
 
 
 def yellow(msg):
-    return f"\x0308{msg}\x0f"
+    return "\x0308{}\x0f".format(msg)
 
 
 def parse_args():
@@ -155,9 +155,13 @@ def format_message(host, stage):
         s = green("success")
     else:
         s = red("failure")
-    return (
-        f"{host.irc_extra}{s}: {host.project} at {purple(host.commit)} "
-        f"on {host.branch} - {host.url}"
+    return "{extra}{s}: {project} at {commit} on {branch} - {url}".format(
+        project=host.project,
+        branch=host.branch,
+        url=host.url,
+        extra=host.irc_extra,
+        commit=purple(host.commit),
+        s=s,
     )
 
 
@@ -171,7 +175,8 @@ def on_disconnect(_connection, _event):
 
 
 def on_nicknameinuse(connection, _event):
-    connection.nick(f"{connection.nickname}_")
+    connection.nickname += "_"
+    connection.nick(connection.nickname)
 
 
 def main():
