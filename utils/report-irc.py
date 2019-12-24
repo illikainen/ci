@@ -61,7 +61,7 @@ class GitLab:
 
     @property
     def commit(self):
-        return getenv("CI_COMMIT_SHA")
+        return getenv("CI_TRIGGER_COMMIT", getenv("CI_COMMIT_SHA"))
 
     @property
     def project(self):

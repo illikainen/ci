@@ -12,6 +12,11 @@ ci_install() {
 }
 
 ci_build() {
+    if [[ -n "${CI_TRIGGER_COMMIT:-}" ]]; then
+        git reset --hard "$CI_TRIGGER_COMMIT"
+    fi
+    ci_info "building $(git rev-parse HEAD)"
+
     make configure
     {
         echo "DEVELOPER = 1"

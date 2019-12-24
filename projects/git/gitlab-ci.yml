@@ -15,6 +15,7 @@ variables:
     ${CI}/utils/ci.sh on_start
     if ${CI}/utils/ci.sh install build test; then
         ${CI}/utils/ci.sh on_success
+        ${CI}/utils/ci.sh on_finish
     else
         ${CI}/utils/ci.sh on_failure
         exit 1
