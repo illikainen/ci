@@ -18,7 +18,7 @@ environment:
     secure: u9Vi89nx5Lmrv3tnTMq9OA==
   IRC_NICK:
     secure: OVO9f8TnD9Jm8w1g4WaABg==
-  IRC_CHANNELS:
+  IRC_TARGETS:
     secure: k8v55p1PTJetGc+zIaNMFQ==
   CI: /tmp/ci
   CI_PROJECT: $APPVEYOR_PROJECT_NAME

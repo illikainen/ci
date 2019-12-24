@@ -71,9 +71,9 @@ def parse_args():
         help="Nickname to use.  An underscore is appended if it's in use.",
     )
     ap.add_argument(
-        "--channels",
-        default=getenv("IRC_CHANNELS"),
-        help="Comma-separated list of channels.",
+        "--targets",
+        default=getenv("IRC_TARGETS"),
+        help="Comma-separated list of targets.",
     )
     ap.add_argument(
         "--debug",
@@ -119,7 +119,7 @@ def format_message(args):
 
 
 def on_welcome(connection, _event):
-    connection.privmsg_many(connection.channels, connection.message)
+    connection.privmsg_many(connection.targets, connection.message)
     connection.disconnect()
 
 
@@ -146,7 +146,7 @@ def main():
     connection = client.server().connect(
         args.server, args.port, args.nick, connect_factory=factory
     )
-    connection.channels = args.channels.split(",")
+    connection.targets = args.targets.split(",")
     connection.message = format_message(args)
     connection.add_global_handler("welcome", on_welcome)
     connection.add_global_handler("disconnect", on_disconnect)
