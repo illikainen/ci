@@ -19,7 +19,13 @@ variables = {
             "{APPVEYOR_URL}/project/{APPVEYOR_ACCOUNT_NAME}/"
             "{APPVEYOR_PROJECT_NAME}/builds/{APPVEYOR_BUILD_ID}"
         ),
-    }
+    },
+    "gitlab_ci": {
+        "branch": "{CI_COMMIT_BRANCH}",
+        "commit": "{CI_COMMIT_SHA}",
+        "project": "{CI_PROJECT_NAME}",
+        "url": "{CI_JOB_URL}",
+    },
 }
 
 
