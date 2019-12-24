@@ -3,37 +3,96 @@
 import ssl
 import sys
 from argparse import ArgumentParser
+from base64 import b64decode
 from logging import DEBUG, basicConfig
-from os import getenv, environ
+from os import getenv
 
 from irc.client import IRC
 from irc.connection import Factory
 
 
-variables = {
-    "appveyor": {
-        "branch": "{APPVEYOR_REPO_BRANCH}",
-        "commit": "{APPVEYOR_REPO_COMMIT}",
-        "project": "{APPVEYOR_PROJECT_NAME}",
-        "url": (
-            "{APPVEYOR_URL}/project/{APPVEYOR_ACCOUNT_NAME}/"
-            "{APPVEYOR_PROJECT_NAME}/builds/{APPVEYOR_BUILD_ID}"
-        ),
-    },
-    "gitlab_ci": {
-        "branch": "{CI_COMMIT_BRANCH}",
-        "commit": "{CI_COMMIT_SHA}",
-        "project": "{CI_PROJECT_NAME}",
-        "url": "{CI_JOB_URL}",
-    },
-}
+class AppVeyor:
+    @property
+    def branch(self):
+        return getenv("APPVEYOR_REPO_BRANCH")
+
+    @property
+    def commit(self):
+        return getenv("APPVEYOR_REPO_COMMIT")
+
+    @property
+    def project(self):
+        return getenv("APPVEYOR_PROJECT_NAME")
+
+    @property
+    def url(self):
+        return (
+            f"{getenv('APPVEYOR_URL')}/project/"
+            f"{getenv('APPVEYOR_ACCOUNT_NAME')}/"
+            f"{getenv('APPVEYOR_PROJECT_NAME')}/builds/"
+            f"{getenv('APPVEYOR_BUILD_ID')}"
+        )
+
+    @property
+    def irc_server(self):
+        return getenv("IRC_SERVER")
+
+    @property
+    def irc_port(self):
+        return int(getenv("IRC_PORT"))
+
+    @property
+    def irc_nick(self):
+        return getenv("IRC_NICK")
+
+    @property
+    def irc_targets(self):
+        return getenv("IRC_TARGETS")
 
 
-def getvar(name):
-    for key, value in variables.items():
-        if getenv(key.upper()):
-            return value[name].format(**environ)
-    return getenv(name)
+class GitLab:
+    @property
+    def branch(self):
+        return getenv("CI_COMMIT_BRANCH")
+
+    @property
+    def commit(self):
+        return getenv("CI_COMMIT_SHA")
+
+    @property
+    def project(self):
+        return getenv("CI_PROJECT_NAME")
+
+    @property
+    def url(self):
+        return getenv("CI_JOB_URL")
+
+    @property
+    def irc_server(self):
+        return b64decode(getenv("IRC_SERVER")).decode()
+
+    @property
+    def irc_port(self):
+        return int(b64decode(getenv("IRC_PORT")).decode())
+
+    @property
+    def irc_nick(self):
+        return b64decode(getenv("IRC_NICK")).decode()
+
+    @property
+    def irc_targets(self):
+        return b64decode(getenv("IRC_TARGETS")).decode()
+
+
+def get_host():
+    if getenv("APPVEYOR"):
+        return AppVeyor()
+
+    if getenv("GITLAB_CI"):
+        return GitLab()
+
+    sys.stderr.write(f"invalid host")
+    sys.exit(1)
 
 
 def green(msg):
@@ -54,27 +113,6 @@ def yellow(msg):
 
 def parse_args():
     ap = ArgumentParser()
-    ap.add_argument(
-        "--server",
-        default=getenv("IRC_SERVER"),
-        help="IRC server to connect to.",
-    )
-    ap.add_argument(
-        "--port",
-        default=int(getenv("IRC_PORT", "6697")),
-        type=int,
-        help="Port that the server is listening on.",
-    )
-    ap.add_argument(
-        "--nick",
-        default=getenv("IRC_NICK"),
-        help="Nickname to use.  An underscore is appended if it's in use.",
-    )
-    ap.add_argument(
-        "--targets",
-        default=getenv("IRC_TARGETS"),
-        help="Comma-separated list of targets.",
-    )
     ap.add_argument(
         "--debug",
         default=bool(int(getenv("IRC_DEBUG", "0"))),
@@ -102,20 +140,17 @@ def parse_args():
     return args
 
 
-def format_message(args):
-    if args.stage == "start":
-        stage = yellow("starting")
-    elif args.stage == "success":
-        stage = green("success")
+def format_message(host, stage):
+    if stage == "start":
+        s = yellow("starting")
+    elif stage == "success":
+        s = green("success")
     else:
-        stage = red("failure")
-
-    url = getvar("url")
-    project = getvar("project")
-    branch = getvar("branch")
-    commit = purple(getvar("commit"))
-
-    return f"{stage}: {project} at {commit} on {branch} - {url}"
+        s = red("failure")
+    return (
+        f"{s}: {host.project} at {purple(host.commit)} "
+        f"on {host.branch} - {host.url}"
+    )
 
 
 def on_welcome(connection, _event):
@@ -142,12 +177,13 @@ def main():
     else:
         factory = Factory(wrapper=ssl.wrap_socket)
 
+    host = get_host()
     client = IRC()
     connection = client.server().connect(
-        args.server, args.port, args.nick, connect_factory=factory
+        host.irc_server, host.irc_port, host.irc_nick, connect_factory=factory
     )
-    connection.targets = args.targets.split(",")
-    connection.message = format_message(args)
+    connection.targets = host.irc_targets.split(",")
+    connection.message = format_message(host, args.stage)
     connection.add_global_handler("welcome", on_welcome)
     connection.add_global_handler("disconnect", on_disconnect)
     connection.add_global_handler("nicknameinuse", on_nicknameinuse)
