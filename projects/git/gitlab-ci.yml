@@ -4,10 +4,18 @@ variables:
   CI: /tmp/ci
   CI_PROJECT: $CI_PROJECT_NAME
   CI_DESTDIR: /tmp/build
+  GIT_TEST_OPTS: --immediate --tee --verbose-log --root=t/test-results
 
-.apt_template: &apt
+.base_template: &base
   only:
     - /^hji-/
+  artifacts:
+    paths:
+      - t/test-results
+    when: on_failure
+
+.apt_template: &apt
+  <<: *base
   script: |
     apt-get update
     apt-get install --assume-yes git lsb-release
@@ -22,8 +30,7 @@ variables:
     fi
 
 .dnf_template: &dnf
-  only:
-    - /^hji-/
+  <<: *base
   script: |
     dnf install --assumeyes git
     git clone --depth 1 https://github.com/illikainen/ci.git "$CI"
