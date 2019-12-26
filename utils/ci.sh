@@ -50,6 +50,8 @@ ci_on_start() {
     if ci_is_debian || ci_is_ubuntu; then
         ci_sudo apt-get update
         ci_sudo apt-get --yes install python3-pip
+    elif ci_is_centos || ci_is_fedora; then
+        ci_sudo dnf --assumeyes install python3-pip
     fi
 
     # Not available in the Ubuntu 16.04 repos.
