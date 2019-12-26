@@ -8,6 +8,37 @@ ci_install() {
         ci_sudo apt-get update
         ci_sudo apt-get --assume-yes build-dep git
         ci_sudo apt-get --assume-yes install autoconf automake gnupg gpgsm
+    elif ci_is_centos || ci_is_fedora; then
+        ci_sudo dnf --assumeyes install \
+                acl \
+                asciidoc \
+                autoconf \
+                automake \
+                diffutils \
+                expat-devel \
+                findutils \
+                gawk \
+                gcc \
+                gcc-c++ \
+                gettext-devel \
+                gnupg2 \
+                gnupg2-smime \
+                libcurl-devel \
+                libsecret-devel \
+                make \
+                openssl-devel \
+                pcre2-devel \
+                perl-Memoize \
+                pkgconfig \
+                python2 \
+                python3 \
+                subversion \
+                subversion-perl \
+                tcl \
+                tk \
+                xmlto \
+                zlib-devel
+        ci_sudo ln -s /usr/bin/python2 /usr/bin/python
     fi
 }
 
