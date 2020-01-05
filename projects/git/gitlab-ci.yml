@@ -14,6 +14,21 @@ variables:
       - t/test-results
     when: on_failure
 
+.apk_template: &apk
+  <<: *base
+  script: |
+    apk update
+    apk add bash git
+    git clone --depth 1 https://github.com/illikainen/ci.git "$CI"
+    ${CI}/utils/ci.sh on_start
+    if ${CI}/utils/ci.sh install build test; then
+        ${CI}/utils/ci.sh on_success
+        ${CI}/utils/ci.sh on_finish
+    else
+        ${CI}/utils/ci.sh on_failure
+        exit 1
+    fi
+
 .apt_template: &apt
   <<: *base
   script: |
@@ -42,6 +57,12 @@ variables:
         ${CI}/utils/ci.sh on_failure
         exit 1
     fi
+
+test:alpine-latest:
+  image: alpine:latest
+  variables:
+    IRC_EXTRA: alpine-latest
+  <<: *apk
 
 test:ubuntu-16.04:
   image: ubuntu:16.04

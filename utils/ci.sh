@@ -28,6 +28,10 @@ ci_sudo () {
     fi
 }
 
+ci_is_alpine() {
+    test -f /etc/alpine-release
+}
+
 ci_is_debian() {
     command -v lsb_release >/dev/null &&
         [[ "$(lsb_release --id --short)" == "Debian" ]]
@@ -47,7 +51,10 @@ ci_is_fedora() {
 }
 
 ci_on_start() {
-    if ci_is_debian || ci_is_ubuntu; then
+    if ci_is_alpine; then
+        ci_sudo apk update
+        ci_sudo apk add python3
+    elif ci_is_debian || ci_is_ubuntu; then
         ci_sudo apt-get update
         ci_sudo apt-get --yes install python3-pip
     elif ci_is_centos || ci_is_fedora; then
