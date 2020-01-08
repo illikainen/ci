@@ -1,0 +1,40 @@
+FROM centos:8
+
+RUN dnf --assumeyes upgrade
+RUN dnf --assumeyes install \
+    acl \
+    asciidoc \
+    autoconf \
+    automake \
+    diffutils \
+    expat-devel \
+    findutils \
+    gawk \
+    gcc \
+    gcc-c++ \
+    gettext-devel \
+    git \
+    gnupg2 \
+    gnupg2-smime \
+    libcurl-devel \
+    libsecret-devel \
+    make \
+    openssl-devel \
+    pcre2-devel \
+    perl-Memoize \
+    pkgconfig \
+    python2 \
+    python3 \
+    subversion \
+    subversion-perl \
+    tcl \
+    tk \
+    xmlto \
+    zlib-devel
+RUN useradd --create-home --user-group user
+
+USER user
+
+ENV CI_SRC "/src/ci"
+
+COPY --chown=user:user . "$CI_SRC"
