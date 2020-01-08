@@ -1,0 +1,20 @@
+FROM ubuntu:16.04
+
+RUN sed 's/^deb[ \s]/deb-src /' /etc/apt/sources.list \
+    >/etc/apt/sources.list.d/src.list
+RUN apt-get update && apt-get --assume-yes dist-upgrade
+RUN apt-get update && apt-get --assume-yes build-dep git
+RUN apt-get update && apt-get --assume-yes install \
+    autoconf \
+    automake \
+    git \
+    gnupg \
+    gpgsm \
+    python3
+RUN useradd --create-home --user-group user
+
+USER user
+
+ENV CI_SRC "/src/ci"
+
+COPY --chown=user:user . "$CI_SRC"
