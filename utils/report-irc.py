@@ -4,11 +4,8 @@ import ssl
 import sys
 from argparse import ArgumentParser
 from base64 import b64decode
-from logging import DEBUG, basicConfig
 from os import getenv
-
-from irc.client import IRC
-from irc.connection import Factory
+from socket import AF_INET, SOCK_STREAM, socket
 
 
 class AppVeyor:
@@ -47,7 +44,7 @@ class AppVeyor:
 
     @property
     def irc_targets(self):
-        return getenv("IRC_TARGETS")
+        return getenv("IRC_TARGETS").split(",")
 
     @property
     def irc_extra(self):
@@ -85,7 +82,7 @@ class GitLab:
 
     @property
     def irc_targets(self):
-        return b64decode(getenv("IRC_TARGETS")).decode()
+        return b64decode(getenv("IRC_TARGETS")).decode().split(",")
 
     @property
     def irc_extra(self):
@@ -99,7 +96,7 @@ def get_host():
     if getenv("GITLAB_CI"):
         return GitLab()
 
-    sys.stderr.write("invalid host")
+    sys.stderr.write("invalid host\n")
     sys.exit(1)
 
 
@@ -122,30 +119,12 @@ def yellow(msg):
 def parse_args():
     ap = ArgumentParser()
     ap.add_argument(
-        "--debug",
-        default=bool(int(getenv("IRC_DEBUG", "0"))),
-        action="store_true",
-        help="Enable debug messages.",
-    )
-    ap.add_argument(
-        "--no-ssl",
-        default=bool(int(getenv("IRC_NO_SSL", "0"))),
-        action="store_true",
-        help="Disable SSL connections.",
-    )
-    ap.add_argument(
         "--stage",
         choices=["start", "success", "failure"],
         required=True,
         help="Current stage.",
     )
-
-    args = ap.parse_args()
-    for value in vars(args).values():
-        if value is None:
-            ap.print_usage()
-            sys.exit(1)
-    return args
+    return ap.parse_args()
 
 
 def format_message(host, stage):
@@ -165,42 +144,48 @@ def format_message(host, stage):
     )
 
 
-def on_welcome(connection, _event):
-    connection.privmsg_many(connection.targets, connection.message)
-    connection.disconnect()
+def report(server, port, nick, targets, message):
+    ctx = ssl.create_default_context()
+    with socket(AF_INET, SOCK_STREAM) as plain:
+        with ctx.wrap_socket(plain, server_hostname=server) as sock:
+            sock.connect((server, port))
+            sock.send("NICK {}\r\n".format(nick).encode())
+            sock.send("USER {0} {0} {0} {0}\r\n".format(nick).encode())
 
+            f = sock.makefile()
+            while True:
+                line = f.readline()
+                if not line:
+                    break
 
-def on_disconnect(_connection, _event):
-    raise SystemExit()
-
-
-def on_nicknameinuse(connection, _event):
-    connection.nickname += "_"
-    connection.nick(connection.nickname)
+                fields = line.split()
+                if len(fields) >= 1:
+                    if fields[0] == "PING":
+                        sock.send("PONG {}\r\n".format(fields[1]).encode())
+                    elif fields[1] == "376":
+                        for target in targets:
+                            sock.send(
+                                "PRIVMSG {} :{}\r\n".format(
+                                    target, message
+                                ).encode()
+                            )
+                            sock.send("QUIT\r\n".encode())
+                    elif fields[1] == "433":
+                        nick += "_"
+                        sock.send("NICK {}\r\n".format(nick).encode())
 
 
 def main():
     args = parse_args()
-
-    if args.debug:
-        basicConfig(level=DEBUG)
-
-    if args.no_ssl:
-        factory = Factory()
-    else:
-        factory = Factory(wrapper=ssl.wrap_socket)
-
     host = get_host()
-    client = IRC()
-    connection = client.server().connect(
-        host.irc_server, host.irc_port, host.irc_nick, connect_factory=factory
+    message = format_message(host, args.stage)
+    report(
+        host.irc_server,
+        host.irc_port,
+        host.irc_nick,
+        host.irc_targets,
+        message,
     )
-    connection.targets = host.irc_targets.split(",")
-    connection.message = format_message(host, args.stage)
-    connection.add_global_handler("welcome", on_welcome)
-    connection.add_global_handler("disconnect", on_disconnect)
-    connection.add_global_handler("nicknameinuse", on_nicknameinuse)
-    client.process_forever()
 
 
 if __name__ == "__main__":

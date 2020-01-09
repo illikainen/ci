@@ -56,13 +56,11 @@ ci_on_start() {
         ci_sudo apk add python3
     elif ci_is_debian || ci_is_ubuntu; then
         ci_sudo apt-get update
-        ci_sudo apt-get --yes install python3-pip
+        ci_sudo apt-get --yes install python3
     elif ci_is_centos || ci_is_fedora; then
-        ci_sudo dnf --assumeyes install python3-pip
+        ci_sudo dnf --assumeyes install python3
     fi
 
-    # Not available in the Ubuntu 16.04 repos.
-    pip3 install irc==8.5.3
     "${CI}/utils/report-irc.py" --stage start
 }
 
