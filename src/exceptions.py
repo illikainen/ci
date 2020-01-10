@@ -1,0 +1,2 @@
+class CIError(Exception):
+    pass

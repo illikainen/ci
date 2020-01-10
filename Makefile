@@ -1,4 +1,4 @@
-PYTHON_FILES := $(shell find . -type f -iname '*.py')
+PYTHON_FILES := ci $(shell find . -type f -iname '*.py')
 SHELL_FILES := $(shell find . -type f -iname '*.sh')
 YAML_FILES := .
 
@@ -13,7 +13,7 @@ test: test-python test-shell test-yaml
 
 test-python:
 	black --check --line-length 79 --quiet $(PYTHON_FILES)
-	pycodestyle $(PYTHON_FILES)
+	pycodestyle --ignore=E203 $(PYTHON_FILES)
 	pylint3 $(PYTHON_FILES)
 
 test-shell:
