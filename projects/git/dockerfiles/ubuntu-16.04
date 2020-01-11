@@ -1,5 +1,7 @@
 FROM ubuntu:16.04
 
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN sed 's/^deb[ \s]/deb-src /' /etc/apt/sources.list \
     >/etc/apt/sources.list.d/src.list
 RUN apt-get update && apt-get --assume-yes dist-upgrade
@@ -7,6 +9,7 @@ RUN apt-get update && apt-get --assume-yes build-dep git
 RUN apt-get update && apt-get --assume-yes install \
     autoconf \
     automake \
+    ca-certificates \
     git \
     gnupg \
     gpgsm \
@@ -15,6 +18,7 @@ RUN useradd --create-home --user-group user
 
 USER user
 
+ENV LC_ALL "C.UTF-8"
 ENV CI_SRC "/src/ci"
 
 COPY --chown=user:user . "$CI_SRC"
