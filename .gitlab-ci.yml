@@ -1,0 +1,20 @@
+---
+# This pipeline builds the images that are used by
+# projects/*/gitlab-ci.yml
+
+image: docker:19.03
+
+variables:
+  DOCKER_CONTENT_TRUST: 1
+
+before_script:
+  - apk update
+  - apk upgrade
+  - apk add python3
+
+build:
+  artifacts:
+    paths:
+      - $HOME/.ci/docker-ids.json
+  script:
+    - ./ci build-images --push --notify
