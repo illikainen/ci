@@ -1,90 +1,33 @@
 ---
 variables:
-  DEBIAN_FRONTEND: noninteractive
-  CI: /tmp/ci
-  CI_PROJECT: $CI_PROJECT_NAME
-  CI_DESTDIR: /tmp/build
-  GIT_TEST_OPTS: --immediate --tee --verbose-log --root=t/test-results
+  DOCKER_CONTENT_TRUST: 1
 
-.base_template: &base
+.common_template: &common
   only:
     - /^hji-/
   artifacts:
     paths:
       - t/test-results
     when: on_failure
+  script:
+    - ${CI_SRC}/ci run-pipeline --notify --trigger
 
-.apk_template: &apk
-  <<: *base
-  script: |
-    apk update
-    apk add bash git
-    git clone --depth 1 https://github.com/illikainen/ci.git "$CI"
-    ${CI}/utils/ci.sh on_start
-    if ${CI}/utils/ci.sh install build test; then
-        ${CI}/utils/ci.sh on_success
-        ${CI}/utils/ci.sh on_finish
-    else
-        ${CI}/utils/ci.sh on_failure
-        exit 1
-    fi
+test:alpine-3.11:
+  image: ${CI_REGISTRY_IMAGE}/git:alpine-3.11
+  <<: *common
 
-.apt_template: &apt
-  <<: *base
-  script: |
-    apt-get update
-    apt-get install --assume-yes git lsb-release
-    git clone --depth 1 https://github.com/illikainen/ci.git "$CI"
-    ${CI}/utils/ci.sh on_start
-    if ${CI}/utils/ci.sh install build test; then
-        ${CI}/utils/ci.sh on_success
-        ${CI}/utils/ci.sh on_finish
-    else
-        ${CI}/utils/ci.sh on_failure
-        exit 1
-    fi
+test:centos-7:
+  image: ${CI_REGISTRY_IMAGE}/git:centos-7
+  <<: *common
 
-.dnf_template: &dnf
-  <<: *base
-  script: |
-    dnf install --assumeyes git
-    git clone --depth 1 https://github.com/illikainen/ci.git "$CI"
-    ${CI}/utils/ci.sh on_start
-    if ${CI}/utils/ci.sh install build test; then
-        ${CI}/utils/ci.sh on_success
-        ${CI}/utils/ci.sh on_finish
-    else
-        ${CI}/utils/ci.sh on_failure
-        exit 1
-    fi
-
-test:alpine-latest:
-  image: alpine:latest
-  variables:
-    IRC_EXTRA: alpine-latest
-  <<: *apk
+test:fedora-31:
+  image: ${CI_REGISTRY_IMAGE}/git:fedora-31
+  <<: *common
 
 test:ubuntu-16.04:
-  image: ubuntu:16.04
-  variables:
-    IRC_EXTRA: ubuntu-16.04
-    CI_CAN_START_BUILD: 1
-  <<: *apt
+  image: ${CI_REGISTRY_IMAGE}/git:ubuntu-16.04
+  <<: *common
 
-test:ubuntu-latest:
-  image: ubuntu:latest
-  variables:
-    IRC_EXTRA: ubuntu-latest
-  <<: *apt
-
-test:centos-8:
-  image: centos:8
-  variables:
-    IRC_EXTRA: centos-8
-  <<: *dnf
-
-test:fedora-latest:
-  image: fedora:latest
-  variables:
-    IRC_EXTRA: fedora-latest
-  <<: *dnf
+test:ubuntu-19.10:
+  image: ${CI_REGISTRY_IMAGE}/git:ubuntu-19.10
+  <<: *common
