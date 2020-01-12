@@ -33,7 +33,7 @@ def main():
 
 
 def _parse_args():
-    local = not environ.get("local")
+    local = not environ.get("CI")
     ap = ArgumentParser()
     ap.set_defaults(fn=lambda *_args, **_kwargs: ap.error("missing action"))
     sp = ap.add_subparsers()
