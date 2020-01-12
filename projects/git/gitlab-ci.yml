@@ -1,6 +1,7 @@
 ---
 variables:
   DOCKER_CONTENT_TRUST: 1
+  REGISTRY: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/ci/${CI_PROJECT_NAME}
 
 .common:
   only:
@@ -13,21 +14,21 @@ variables:
     - ${CI_SRC}/ci run-pipeline --notify --trigger
 
 test:alpine-3.11:
-  image: ${CI_REGISTRY_IMAGE}/git:alpine-3.11
+  image: ${REGISTRY}:alpine-3.11
   extends: .common
 
 test:centos-7:
-  image: ${CI_REGISTRY_IMAGE}/git:centos-7
+  image: ${REGISTRY}:centos-7
   extends: .common
 
 test:fedora-31:
-  image: ${CI_REGISTRY_IMAGE}/git:fedora-31
+  image: ${REGISTRY}:fedora-31
   extends: .common
 
 test:ubuntu-16.04:
-  image: ${CI_REGISTRY_IMAGE}/git:ubuntu-16.04
+  image: ${REGISTRY}:ubuntu-16.04
   extends: .common
 
 test:ubuntu-19.10:
-  image: ${CI_REGISTRY_IMAGE}/git:ubuntu-19.10
+  image: ${REGISTRY}:ubuntu-19.10
   extends: .common
