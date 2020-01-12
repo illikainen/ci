@@ -19,4 +19,4 @@ build:
     paths:
       - $HOME/.ci/docker-ids.json
   script:
-    - ./ci build-images --push --notify
+    - ./ci build-images --push --push-insecure --notify

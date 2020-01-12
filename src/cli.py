@@ -45,6 +45,8 @@ def _parse_args():
     bi.add_argument("--images", nargs="*")
     bi.add_argument("--projects", nargs="*")
     bi.add_argument("--push", action="store_true")
+    # Can't push with content trust to the GitLab registry afaict.
+    bi.add_argument("--push-insecure", action="store_true")
 
     rp = sp.add_parser("run-pipeline")
     rp.set_defaults(fn=_run_pipeline)

@@ -29,7 +29,7 @@ def build(project, image, args):
         call("docker", "system", "prune", "--force")
 
 
-def push(project, image, _args):
+def push(project, image, args):
     p = pipeline.get()
 
     call(
@@ -44,7 +44,12 @@ def push(project, image, _args):
     local_tag = _get_local_tag(project, image)
     registry_tag = _get_registry_tag(project, image, p.registry_namespace_url)
     call("docker", "tag", local_tag, registry_tag)
-    call("docker", "push", registry_tag)
+    call(
+        "docker",
+        "push",
+        "--disable-content-trust" if args.push_insecure else None,
+        registry_tag,
+    )
 
 
 def run(project, image, args):
