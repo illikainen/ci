@@ -32,7 +32,7 @@ def call(*args, stdin=None):
     # rather than written to stdin.
     special = set("!\"#$%&'()*+,;<>?@[\\]^_`{|}~")
     cmd = " ".join([x for x in args if special.isdisjoint(x)])
-    info("running {}", cmd)
+    info("executing {}", cmd)
 
     try:
         p = Popen(
