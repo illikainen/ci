@@ -26,6 +26,14 @@ def error(fmt, *args, **kwargs):
 
 def call(*args, stdin=None):
     args = [str(x) for x in args if x]
+
+    # super-hacky way of filtering password-like strings as a fallback
+    # if some secret were to accidentally be passed as an argument
+    # rather than written to stdin.
+    special = set("!\"#$%&'()*+,;<>?@[\\]^_`{|}~")
+    cmd = " ".join([x for x in args if special.isdisjoint(x)])
+    info("running {}", cmd)
+
     try:
         p = Popen(
             args, stdin=PIPE if stdin else None, stdout=PIPE, stderr=STDOUT
@@ -48,7 +56,7 @@ def call(*args, stdin=None):
 
     p.wait()
     if p.returncode:
-        raise CIError(args[0])
+        raise CIError("{}: {}".format(p.returncode, cmd))
     return output
 
 
