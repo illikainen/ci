@@ -12,7 +12,9 @@ from . import const, irc, image, pipeline
 def main():
     environ["DOCKER_CONTENT_TRUST"] = "1"
     args = _parse_args()
-    ci = const.LOCAL_SRC if args.local else const.CONTAINER_SRC
+    ci = (
+        const.LOCAL_SRC if args.local or args.local_ci else const.CONTAINER_SRC
+    )
     notify = getattr(args, "notify", False) and not args.local
 
     info("running {}", "locally" if args.local else "on ci")
@@ -34,6 +36,8 @@ def main():
 
 def _parse_args():
     local = not environ.get("CI")
+    local_ci = not local and environ.get("CI_PROJECT_NAME") == "ci"
+
     ap = ArgumentParser()
     ap.set_defaults(fn=lambda *_args, **_kwargs: ap.error("missing action"))
     sp = ap.add_subparsers()
@@ -59,6 +63,7 @@ def _parse_args():
 
     args = ap.parse_args()
     args.local = local
+    args.local_ci = local_ci
     return args
 
 
