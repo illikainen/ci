@@ -66,6 +66,7 @@ def _build_images(ci, args):
             info("{}: {}: building", proj.name, img.name)
             image.build(proj, img, args)
             if args.push:
+                info("{}: {}: pushing", proj.name, img.name)
                 image.push(proj, img, args)
 
 
