@@ -3,6 +3,8 @@
 # projects/*/gitlab-ci.yml
 
 image: docker:19.03
+services:
+  - docker:19.03-dind
 
 variables:
   DOCKER_CONTENT_TRUST: 1
