@@ -56,7 +56,7 @@ def _parse_args():
         rp.add_argument("--images", nargs="*")
 
     args = ap.parse_args()
-    args.local = not environ.get("CI")
+    args.local = local
     return args
 
 
