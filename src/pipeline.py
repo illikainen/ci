@@ -138,7 +138,11 @@ class GitLab(Pipeline):
             # The commit hash has to be extracted from the environment
             # variables for triggered builds.
             for pipeline in ids:
-                with urlopen("{}/{}/variables".format(url, pipeline)) as res:
+                req = Request(
+                    "{}/{}/variables".format(url, pipeline),
+                    headers={"PRIVATE-TOKEN": self.token},
+                )
+                with urlopen(req) as res:
                     for elt in json.loads(res.read().decode()):
                         if elt.get("key") == "CI_TRIGGER_COMMIT":
                             commits.append(elt.get("value"))
