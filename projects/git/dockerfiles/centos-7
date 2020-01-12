@@ -23,6 +23,7 @@ RUN yum --assumeyes install \
     pcre2-devel \
     perl-Digest-MD5 \
     perl-Memoize \
+    pinentry \
     pkgconfig \
     python2 \
     python3 \

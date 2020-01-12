@@ -21,6 +21,7 @@ RUN dnf --assumeyes install \
     openssl-devel \
     pcre2-devel \
     perl-Memoize \
+    pinentry \
     pkgconfig \
     python2 \
     python3 \

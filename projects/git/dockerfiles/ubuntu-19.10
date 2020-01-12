@@ -9,10 +9,18 @@ RUN apt-get update && apt-get --assume-yes build-dep git
 RUN apt-get update && apt-get --assume-yes install \
     autoconf \
     automake \
+    dirmngr \
     git \
     gnupg \
+    gpg-agent \
+    gpg-wks-client \
+    gpg-wks-server \
+    gpgconf \
     gpgsm \
-    python3
+    pinentry-curses \
+    pinentry-tty \
+    python3 \
+    scdaemon
 RUN useradd --create-home --user-group user
 
 USER user

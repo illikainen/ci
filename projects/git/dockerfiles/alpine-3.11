@@ -12,9 +12,11 @@ RUN apk update && apk add \
     gettext-dev \
     git \
     gnupg \
+    gnupg-scdaemon \
     grep \
     openssh-client \
     pcre2-dev \
+    pinentry \
     pkgconf \
     python \
     python3 \
