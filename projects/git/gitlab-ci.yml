@@ -2,7 +2,7 @@
 variables:
   DOCKER_CONTENT_TRUST: 1
 
-.common_template: &common
+.common:
   only:
     - /^hji-/
   artifacts:
@@ -14,20 +14,20 @@ variables:
 
 test:alpine-3.11:
   image: ${CI_REGISTRY_IMAGE}/git:alpine-3.11
-  <<: *common
+  extends: .common
 
 test:centos-7:
   image: ${CI_REGISTRY_IMAGE}/git:centos-7
-  <<: *common
+  extends: .common
 
 test:fedora-31:
   image: ${CI_REGISTRY_IMAGE}/git:fedora-31
-  <<: *common
+  extends: .common
 
 test:ubuntu-16.04:
   image: ${CI_REGISTRY_IMAGE}/git:ubuntu-16.04
-  <<: *common
+  extends: .common
 
 test:ubuntu-19.10:
   image: ${CI_REGISTRY_IMAGE}/git:ubuntu-19.10
-  <<: *common
+  extends: .common
