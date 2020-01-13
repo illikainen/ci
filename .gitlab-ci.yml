@@ -8,15 +8,39 @@ services:
 
 variables:
   DOCKER_CONTENT_TRUST: 1
+  OPTS: --push --push-insecure --notify
 
 before_script:
   - apk update
   - apk upgrade
   - apk add python3
 
-build:
+.common:
   artifacts:
     paths:
       - $HOME/.ci/docker-ids.json
+
+build:git-alpine-3.11:
+  extends: .common
   script:
-    - ./ci build-images --push --push-insecure --notify
+    - ./ci build-images $OPTS --projects git --images alpine-3.11
+
+build:git-centos-7:
+  extends: .common
+  script:
+    - ./ci build-images $OPTS --projects git --images centos-7
+
+build:git-fedora-31:
+  extends: .common
+  script:
+    - ./ci build-images $OPTS --projects git --images fedora-31
+
+build:git-ubuntu-16.04:
+  extends: .common
+  script:
+    - ./ci build-images $OPTS --projects git --images ubuntu-16.04
+
+build:git-ubuntu-19.10:
+  extends: .common
+  script:
+    - ./ci build-images $OPTS --projects git --images ubuntu-19.10
