@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 from base64 import b64decode
@@ -5,6 +6,9 @@ from contextlib import contextmanager
 from os import chdir, getcwd
 from pathlib import Path
 from subprocess import PIPE, STDOUT, Popen
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 from .exceptions import CIError
 
@@ -118,3 +122,16 @@ def cd(path):
         yield
     finally:
         chdir(old)
+
+
+@contextmanager
+def urlreq(url, data=None, is_json=True, headers=None):
+    if data:
+        data = json.dumps(data) if is_json else urlencode(data)
+        data = data.encode()
+    req = Request(url, data=data, headers=headers or {})
+    try:
+        with urlopen(req) as res:
+            yield json.loads(res.read().decode())
+    except HTTPError as e:
+        raise CIError("{}: {}".format(e.code, url))

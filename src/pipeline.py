@@ -1,11 +1,7 @@
-import json
 from os import environ
-from urllib.error import HTTPError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 
 from .exceptions import CIError
-from .utils import base64decode, get_author, get_commits, info, split
+from .utils import base64decode, get_author, get_commits, info, split, urlreq
 
 
 class Pipeline:
@@ -76,16 +72,8 @@ class AppVeyor(Pipeline):
         url = "{}/api/projects/{}/{}/history?recordsNumber=100".format(
             self.url, self.account, self.project
         )
-        commits = []
-        try:
-            with urlopen(url) as res:
-                obj = json.loads(res.read().decode())
-                builds = obj.get("builds", [])
-                for build in builds:
-                    commits.append(build.get("commitId"))
-        except HTTPError:
-            raise CIError("cannot retrieve history")
-        return commits
+        with urlreq(url) as res:
+            return [build.get("commitId") for build in res.get("builds", [])]
 
     def start_build(self, commit):
         url = "{}/api/account/{}/builds".format(self.url, self.account)
@@ -99,11 +87,8 @@ class AppVeyor(Pipeline):
             "branch": self.branch,
             "commitId": commit,
         }
-        req = Request(url, data=json.dumps(data).encode(), headers=headers)
-        try:
-            urlopen(req)
-        except HTTPError:
-            raise CIError("cannot start build")
+        with urlreq(url, data=data, headers=headers):
+            pass
 
 
 class GitLab(Pipeline):
@@ -128,26 +113,24 @@ class GitLab(Pipeline):
 
     def get_history(self):
         url = "{}/projects/{}/pipelines".format(self.url, self.project_id)
+        headers = {"PRIVATE-TOKEN": self.token}
         commits = []
-        try:
-            ids = []
-            with urlopen(url) as res:
-                for pipeline in json.loads(res.read().decode()):
-                    commits.append(pipeline.get("sha"))
-                    ids.append(pipeline.get("id"))
-            # The commit hash has to be extracted from the environment
-            # variables for triggered builds.
-            for pipeline in ids:
-                req = Request(
-                    "{}/{}/variables".format(url, pipeline),
-                    headers={"PRIVATE-TOKEN": self.token},
-                )
-                with urlopen(req) as res:
-                    for elt in json.loads(res.read().decode()):
-                        if elt.get("key") == "CI_TRIGGER_COMMIT":
-                            commits.append(elt.get("value"))
-        except HTTPError:
-            raise CIError("cannot retrieve history")
+        ids = []
+        with urlreq(url, headers=headers) as res:
+            for pipeline in res:
+                commits.append(pipeline.get("sha"))
+                ids.append(pipeline.get("id"))
+
+        # The commit hash has to be extracted from the environment
+        # variables for triggered builds because the "sha" field seems
+        # to be inherited from the build that does the triggering.
+        for pipeline in ids:
+            vurl = "{}/{}/variables".format(url, pipeline)
+            with urlreq(vurl, headers=headers) as res:
+                for elt in res:
+                    if elt.get("key") == "CI_TRIGGER_COMMIT":
+                        commits.append(elt.get("value"))
+
         return commits
 
     def start_build(self, commit):
@@ -159,11 +142,8 @@ class GitLab(Pipeline):
             "ref": self.branch,
             "variables[CI_TRIGGER_COMMIT]": commit,
         }
-        req = Request(url, data=urlencode(data).encode())
-        try:
-            urlopen(req)
-        except HTTPError:
-            raise CIError("cannot start build")
+        with urlreq(url, data=data, is_json=False):
+            pass
 
 
 def get():
