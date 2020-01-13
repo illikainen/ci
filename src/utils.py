@@ -34,7 +34,7 @@ def error(fmt, *args, **kwargs):
     sys.exit(1)
 
 
-def call(*args, stdin=None):
+def call(*args, stdin=None, show=True):
     args = [str(x) for x in args if x]
 
     # super-hacky way of filtering password-like strings as a fallback
@@ -61,7 +61,8 @@ def call(*args, stdin=None):
     output = []
     for line in iter(p.stdout.readline, b""):
         s = line.decode()
-        print(s, end="")
+        if show:
+            print(s, end="")
         output.append(s)
 
     p.wait()
