@@ -89,12 +89,17 @@ def get_os():
 
 
 def get_author():
-    return call("git", "log", "-1", "--format=%ae")[-1]
+    return call("git", "log", "-1", "--format=%ae", show=False)[-1]
 
 
 def get_commits(author, history):
     lines = call(
-        "git", "log", "--no-show-signature", "--format=%H %ae", "HEAD^1"
+        "git",
+        "log",
+        "--no-show-signature",
+        "--format=%H %ae",
+        "HEAD^1",
+        show=False,
     )
     commits = []
     for line in lines:
