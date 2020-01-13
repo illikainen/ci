@@ -1,8 +1,8 @@
 import ssl
 from socket import AF_INET, SOCK_STREAM, socket
 
-from .utils import get_os
 from . import pipeline
+from .utils import get_os
 
 
 def notify(stage):

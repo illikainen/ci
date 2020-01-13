@@ -4,9 +4,9 @@ from argparse import ArgumentParser
 from os import environ
 from pathlib import Path
 
+from . import const, image, irc, pipeline
 from .exceptions import CIError
 from .utils import error, get_os, info, iterdir
-from . import const, irc, image, pipeline
 
 
 def main():

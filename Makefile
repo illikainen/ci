@@ -8,11 +8,13 @@ fix: fix-python
 
 fix-python:
 	black --line-length 79 $(PYTHON_FILES)
+	isort $(PYTHON_FILES)
 
 test: test-python test-shell test-yaml
 
 test-python:
 	black --check --line-length 79 --quiet $(PYTHON_FILES)
+	isort --check-only $(PYTHON_FILES)
 	pycodestyle --ignore=E203 $(PYTHON_FILES)
 	pylint3 $(PYTHON_FILES)
 

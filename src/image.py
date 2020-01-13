@@ -4,9 +4,9 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryDirectory
 
+from . import const, pipeline
 from .exceptions import CIError
 from .utils import call, cd
-from . import const, pipeline
 
 
 def build(project, image, args):

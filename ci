@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-from src.exceptions import CIError
 from src.cli import main
+from src.exceptions import CIError
 from src.utils import error
-
 
 if __name__ == "__main__":
     try:
