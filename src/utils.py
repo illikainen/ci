@@ -14,12 +14,18 @@ from .exceptions import CIError
 
 RED = "\033[01;31m"
 GREEN = "\033[01;32m"
+YELLOW = "\033[01;33m"
 RESET = "\033[00m"
 
 
 def info(fmt, *args, **kwargs):
     msg = fmt.format(*args, **kwargs)
     print("{}info{}: {}".format(GREEN, RESET, msg))
+
+
+def warn(fmt, *args, **kwargs):
+    msg = fmt.format(*args, **kwargs)
+    print("{}warn{}: {}".format(YELLOW, RESET, msg), file=sys.stderr)
 
 
 def error(fmt, *args, **kwargs):
