@@ -94,7 +94,7 @@ class AppVeyor(Pipeline):
 class GitLab(Pipeline):
     env = {
         "url": "CI_API_V4_URL",
-        "token": "CI_JOB_TOKEN",
+        "token": "CI_PRIVATE_TOKEN",
         "account": "CI_PROJECT_NAMESPACE",
         "project": "CI_PROJECT_NAME",
         "project_id": "CI_PROJECT_ID",
