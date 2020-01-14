@@ -60,9 +60,9 @@ def call(*args, stdin=None, show=True):
 
     output = []
     for line in iter(p.stdout.readline, b""):
-        s = line.decode()
+        s = line.decode().rstrip()
         if show:
-            print(s, end="")
+            print(s)
         output.append(s)
 
     p.wait()
