@@ -30,6 +30,8 @@ ci_build() {
 }
 
 ci_test() {
+    hash -r
+
     key="Signed-off-by"
     if ! git log -1 --format="%(trailers:key=$key)" |grep "^$key"; then
         echo "missing trailer $key" >&2
