@@ -93,20 +93,15 @@ def get_author():
 
 
 def get_commits(author, history):
-    lines = call(
-        "git",
-        "log",
-        "--no-show-signature",
-        "--format=%H %ae",
-        "HEAD^1",
-        show=False,
-    )
+    lines = call("git", "log", "--format=%H %ae", "HEAD^1", show=False)
     commits = []
     for line in lines:
-        commit_hash, commit_author = line.split(" ")
-        if commit_author != author or commit_hash in history:
-            break
-        commits.append(commit_hash)
+        m = re.match(r"([0-9a-f]+) ([^@]+@[^$]+)", line)
+        if m:
+            commit_hash, commit_author = m.groups()
+            if commit_author != author or commit_hash in history:
+                break
+            commits.append(commit_hash)
     return commits
 
 
