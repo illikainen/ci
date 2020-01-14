@@ -95,6 +95,7 @@ class GitLab(Pipeline):
     env = {
         "url": "CI_API_V4_URL",
         "token": "CI_PRIVATE_TOKEN",
+        "job_token": "CI_JOB_TOKEN",
         "account": "CI_PROJECT_NAMESPACE",
         "project": "CI_PROJECT_NAME",
         "project_id": "CI_PROJECT_ID",
@@ -138,7 +139,7 @@ class GitLab(Pipeline):
             self.url, self.project_id
         )
         data = {
-            "token": self.token,
+            "token": self.job_token,
             "ref": self.branch,
             "variables[CI_TRIGGER_COMMIT]": commit,
         }
